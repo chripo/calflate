@@ -5,37 +5,40 @@
 # CREATED: 2014-01-16
 
 from base64 import encodestring
+from os import path
 import re
 from urllib2 import Request, urlopen
 
 def calflate(SRC, DST):
     events = get_events(get_calendar(*SRC))
-    dstset = uid_set(get_events(get_calendar(*DST)))
+    dstmap = uid_seq_map(get_events(get_calendar(*DST)))
     for event in events:
-        if event[2] not in dstset:
-            try:
+        try:
+            if event[2] not in dstmap or event[3] > dstmap[event[2]]:
                 put_event(DST, event)
-                dstset.add(event[2])
-            except Exception as ex:
-                print('fail to put event: %s [%s] due to Exception: %s' % \
-                    (event[2], event[1], ex))
+                dstmap[event[2]] = event[3]
+        except Exception as ex:
+            print('fail to put event: %s [%s] due to Exception: %s' % \
+                (event[2], event[1], ex))
 
 def put_event(DST, event):
-    print("put event: %s [%s]" % (event[2], event[1]))
+    print("PUT event: %s [%s]" % (event[2], event[1]))
     data = new_calendar(event)
-    r = url_usr_request(DST[0], DST[1], DST[2], data)
+    r = url_usr_request(path.join(DST[0], "%s.ics" % event[2]), DST[1], DST[2], data)
     r.add_header('Content-Type', 'text/calendar')
     r.get_method = lambda: 'PUT'
     urlopen(r)
 
-def uid_set(events):
-    return set(e[2] for e in events)
+def uid_seq_map(events):
+    return {e[2]:e[3] for e in events}
 
 def get_events(calendar):
-    r'''yield (data, type, uid)'''
-    event = re.compile(r'^(BEGIN:(VEVENT|VTODO|VJOURNAL)$.*?^UID:(.+?)$.*?^END:\2$)', re.S | re.M)
-    for m in event.finditer(calendar):
-        yield m.groups()
+    r'''yield (data, type, uid, sequence)'''
+    reEvent = re.compile(r'^(BEGIN:(VEVENT|VTODO|VJOURNAL)$.*?^UID:(.+?)$.*?^END:\2$)', re.S | re.M)
+    reSeq = re.compile(r'^SEQUENCE:(\d+?)$', re.M)
+    for m in reEvent.finditer(calendar):
+        sq = reSeq.search(m.group(0))
+        yield m.groups() + (int(sq.group(1)) if sq else 0, )
 
 def get_calendar(url, usr=None, pw=None, *args):
     r = url_usr_request(url, usr, pw, *args)

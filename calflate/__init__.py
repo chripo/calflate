@@ -47,7 +47,7 @@ def put_item(DST, item, options):
     print("PUT item: %s [%s]" % (item[2], item[1]))
     if options.dryrun:
         return
-    data = new_calendar(item)
+    data = new_collection(item)
     r = url_usr_request(path.join(DST[0], "%s.ics" % item[2]), DST[1], DST[2], data)
     r.add_header('Content-Type', 'text/calendar')
     r.get_method = lambda: 'PUT'
@@ -65,11 +65,19 @@ def uid_seq_map(items):
 
 def get_items(calendar):
     r'''yield (data, type, uid, sequence)'''
-    reItem = re.compile(r'^(BEGIN:(VEVENT|VTODO|VJOURNAL)$.*?^UID:(.+?)$.*?^END:\2$)', re.S | re.M)
+    reItem = re.compile(
+        r'^(BEGIN:(VEVENT|VTODO|VJOURNAL|VCARD)$.*?^UID:(.+?)$.*?^END:\2$)', re.S | re.M)
     reSeq = re.compile(r'^SEQUENCE:(\d+?)$', re.M)
+    reRev = re.compile(r'^REV:(.+?)$', re.M)
     for m in reItem.finditer(calendar):
-        sq = reSeq.search(m.group(0))
-        yield m.groups() + (int(sq.group(1)) if sq else 0, )
+        if m.group(2) == 'VCARD':
+            rev = reRev.search(m.group(1))
+            # TODO: check if all date values are sortable
+            rev = rev.group(1) if rev else '0'
+        else:
+            rev = reSeq.search(m.group(1))
+            rev = int(rev.group(1)) if rev else 0
+        yield m.groups() + (rev, )
 
 
 def get_calendar(url, usr=None, pw=None, *args):
@@ -86,8 +94,11 @@ def url_usr_request(url, usr=None, pw=None, *args):
     return r
 
 
-def new_calendar(item):
-    c = r'''BEGIN:VCALENDAR
+def new_collection(item):
+    if item[1] == 'VCARD':
+        c = item[0]
+    else:
+        c = r'''BEGIN:VCALENDAR
 VERSION:2.0
 %s
 END:VCALENDAR

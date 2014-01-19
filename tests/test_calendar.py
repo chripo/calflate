@@ -7,13 +7,13 @@
 import calflate
 
 
-def test_new_empty_calendar():
-    data = calflate.new_calendar(("",))
+def test_new_empty_collection():
+    data = calflate.new_collection(("", "VEVENT", ))
     assert data == 'BEGIN:VCALENDAR\r\nVERSION:2.0\r\nEND:VCALENDAR\r\n'
 
 
-def test_new_calendar():
-    data = calflate.new_calendar(("UID:12345",))
+def test_new_collection():
+    data = calflate.new_collection(("UID:12345", "VEVENT", ))
     assert data == 'BEGIN:VCALENDAR\r\nVERSION:2.0\r\nUID:12345\r\nEND:VCALENDAR\r\n'
 
 

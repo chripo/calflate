@@ -10,6 +10,9 @@ from . import calflate
 def run(SRC, DST):
     parser = OptionParser()
     parser.add_option(
+        '-n', '--dry-drun', action="store_true", default=False,
+        help='dry run', dest='dryrun')
+    parser.add_option(
         '-p', '--purge', action="store_true", default=False,
         help='purge orphan items')
 

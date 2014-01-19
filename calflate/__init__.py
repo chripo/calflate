@@ -17,7 +17,7 @@ def calflate(SRC, DST, options):
         srcuid.add(item[2])
         try:
             if item[2] not in dstmap or item[3] > dstmap[item[2]]:
-                put_item(DST, item)
+                put_item(DST, item, options)
                 dstmap[item[2]] = item[3]
         except Exception as ex:
             print('fail to put item: %s [%s] due to Exception: %s' % \
@@ -26,19 +26,23 @@ def calflate(SRC, DST, options):
         uids = set(dstmap.keys()) - srcuid
         for uid in uids:
             try:
-                delete_item(DST, uid)
+                delete_item(DST, uid, options)
             except Exception as ex:
                 print('fail to delete item: %s due to Exception: %s' % \
                     (uid, ex))
 
-def delete_item(DST, uid):
+def delete_item(DST, uid, options):
     print("DELETE item: %s" % uid)
+    if options.dryrun:
+        return
     r = url_usr_request(path.join(DST[0], "%s.ics" % uid), DST[1], DST[2])
     r.get_method = lambda: 'DELETE'
     p = urlopen(r)
 
-def put_item(DST, item):
+def put_item(DST, item, options):
     print("PUT item: %s [%s]" % (item[2], item[1]))
+    if options.dryrun:
+        return
     data = new_calendar(item)
     r = url_usr_request(path.join(DST[0], "%s.ics" % item[2]), DST[1], DST[2], data)
     r.add_header('Content-Type', 'text/calendar')

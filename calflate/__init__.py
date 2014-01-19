@@ -5,6 +5,7 @@
 # CREATED: 2014-01-16
 
 from base64 import encodestring
+from optparse import OptionParser
 from os import path
 import re
 from urllib2 import Request, urlopen
@@ -80,3 +81,18 @@ END:VCALENDAR
     ''' % item[0]
     return c.replace('\n', '\r\n')
 
+def run(SRC, DST):
+    parser = OptionParser()
+    parser.add_option(
+        '-n', '--dry-drun', action="store_true", default=False,
+        help='dry run', dest='dryrun')
+    parser.add_option(
+        '-p', '--purge', action="store_true", default=False,
+        help='purge orphan items')
+
+    options = parser.parse_args()[0]
+
+    calflate(SRC, DST, options)
+
+if __name__ == '__main__':
+    run(SRC, DST)

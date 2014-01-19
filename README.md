@@ -1,14 +1,37 @@
 Welcome to Calflate
 ===================
 
-A simple python script to merge external calendar events into a
-online calendar.
+Calflate is a simple script to copy or import external
+calendar events into an online calendar.
 
-Calflate has no dependencies. It is licenced under the
-*FreeBSD License* and developed at https://github.com/chripo/calflate
+It has no dependencies, it's Open Source Software and
+licenced under a *FreeBSD License*.
 
-Howto Use
----------
+Developed @ https://github.com/chripo/calflate
+
+Setup
+-----
+
+### Fire And Forget Approach
+
+```sh
+curl https://raw2.github.com/chripo/calflate/master/calflate/__init__.py -o ~/bin/calflate_foo
+
+chmod u+x ~/bin/calflate_foo
+
+$EDITOR ~/bin/calflate_foo
+
+# as first line add
+#!/usr/bin/env python
+
+# as third line add and adjust
+SRC=('https://calendar,source.com/foo.ics/', 'test', 'test')
+DST=('https://my.radicale.org/test/test.ics/', 'test', 'test')
+```
+
+save, exit and run with argument --dry-run first
+
+### Maintainable Strategy
 
 ```sh
 git clone https://github.com/chripo/calflate.git
@@ -19,3 +42,7 @@ edit SRC and DST in calflate_foo.py
 run and commit to local branch
 ```
 
+Contributions
+-------------
+
+Welcome!

@@ -3,8 +3,8 @@
 from setuptools import setup
 
 setup(name='calflate',
-    version='0.2',
-    description='Simple script to merge calendar events into online a calendar.',
+    version='0.3',
+    description='Simple script to copy or import icalendar events.',
     author='Christoph Polcin',
     author_email='labs@polcin.de',
     url='https://github.com/chripo/calflate',

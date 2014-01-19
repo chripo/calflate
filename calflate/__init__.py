@@ -9,7 +9,7 @@ from os import path
 import re
 from urllib2 import Request, urlopen
 
-def calflate(SRC, DST):
+def calflate(SRC, DST, options):
     items = get_items(get_calendar(*SRC))
     dstmap = uid_seq_map(get_items(get_calendar(*DST)))
     srcuid = set()
@@ -22,13 +22,14 @@ def calflate(SRC, DST):
         except Exception as ex:
             print('fail to put item: %s [%s] due to Exception: %s' % \
                 (item[2], item[1], ex))
-    uids = set(dstmap.keys()) - srcuid
-    for uid in uids:
-        try:
-            delete_item(DST, uid)
-        except Exception as ex:
-            print('fail to delete item: %s due to Exception: %s' % \
-                (uid, ex))
+    if options.purge:
+        uids = set(dstmap.keys()) - srcuid
+        for uid in uids:
+            try:
+                delete_item(DST, uid)
+            except Exception as ex:
+                print('fail to delete item: %s due to Exception: %s' % \
+                    (uid, ex))
 
 def delete_item(DST, uid):
     print("DELETE item: %s" % uid)

@@ -10,48 +10,48 @@ import re
 from urllib2 import Request, urlopen
 
 def calflate(SRC, DST):
-    events = get_events(get_calendar(*SRC))
-    dstmap = uid_seq_map(get_events(get_calendar(*DST)))
+    items = get_items(get_calendar(*SRC))
+    dstmap = uid_seq_map(get_items(get_calendar(*DST)))
     srcuid = set()
-    for event in events:
-        srcuid.add(event[2])
+    for item in items:
+        srcuid.add(item[2])
         try:
-            if event[2] not in dstmap or event[3] > dstmap[event[2]]:
-                put_event(DST, event)
-                dstmap[event[2]] = event[3]
+            if item[2] not in dstmap or item[3] > dstmap[item[2]]:
+                put_item(DST, item)
+                dstmap[item[2]] = item[3]
         except Exception as ex:
-            print('fail to put event: %s [%s] due to Exception: %s' % \
-                (event[2], event[1], ex))
+            print('fail to put item: %s [%s] due to Exception: %s' % \
+                (item[2], item[1], ex))
     uids = set(dstmap.keys()) - srcuid
     for uid in uids:
         try:
-            delete_event(DST, uid)
+            delete_item(DST, uid)
         except Exception as ex:
-            print('fail to delete event: %s due to Exception: %s' % \
+            print('fail to delete item: %s due to Exception: %s' % \
                 (uid, ex))
 
-def delete_event(DST, uid):
-    print("DELETE event: %s" % uid)
+def delete_item(DST, uid):
+    print("DELETE item: %s" % uid)
     r = url_usr_request(path.join(DST[0], "%s.ics" % uid), DST[1], DST[2])
     r.get_method = lambda: 'DELETE'
     p = urlopen(r)
 
-def put_event(DST, event):
-    print("PUT event: %s [%s]" % (event[2], event[1]))
-    data = new_calendar(event)
-    r = url_usr_request(path.join(DST[0], "%s.ics" % event[2]), DST[1], DST[2], data)
+def put_item(DST, item):
+    print("PUT item: %s [%s]" % (item[2], item[1]))
+    data = new_calendar(item)
+    r = url_usr_request(path.join(DST[0], "%s.ics" % item[2]), DST[1], DST[2], data)
     r.add_header('Content-Type', 'text/calendar')
     r.get_method = lambda: 'PUT'
     urlopen(r)
 
-def uid_seq_map(events):
-    return {e[2]:e[3] for e in events}
+def uid_seq_map(items):
+    return {e[2]:e[3] for e in items}
 
-def get_events(calendar):
+def get_items(calendar):
     r'''yield (data, type, uid, sequence)'''
-    reEvent = re.compile(r'^(BEGIN:(VEVENT|VTODO|VJOURNAL)$.*?^UID:(.+?)$.*?^END:\2$)', re.S | re.M)
+    reItem = re.compile(r'^(BEGIN:(VEVENT|VTODO|VJOURNAL)$.*?^UID:(.+?)$.*?^END:\2$)', re.S | re.M)
     reSeq = re.compile(r'^SEQUENCE:(\d+?)$', re.M)
-    for m in reEvent.finditer(calendar):
+    for m in reItem.finditer(calendar):
         sq = reSeq.search(m.group(0))
         yield m.groups() + (int(sq.group(1)) if sq else 0, )
 
@@ -67,11 +67,11 @@ def url_usr_request(url, usr=None, pw=None, *args):
         r.add_header("Authorization", "Basic %s" % base64string)
     return r
 
-def new_calendar(event):
+def new_calendar(item):
     c = r'''BEGIN:VCALENDAR
 VERSION:2.0
 %s
 END:VCALENDAR
-    ''' % event[0]
+    ''' % item[0]
     return c.replace('\n', '\r\n')
 

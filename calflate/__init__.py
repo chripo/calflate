@@ -10,6 +10,7 @@ from os import path
 import re
 from urllib2 import Request, urlopen
 
+
 def calflate(SRC, DST, options):
     items = get_items(get_calendar(*SRC))
     dstmap = uid_seq_map(get_items(get_calendar(*DST)))
@@ -21,16 +22,17 @@ def calflate(SRC, DST, options):
                 put_item(DST, item, options)
                 dstmap[item[2]] = item[3]
         except Exception as ex:
-            print('fail to put item: %s [%s] due to Exception: %s' % \
-                (item[2], item[1], ex))
+            print('fail to put item: %s [%s] due to Exception: %s' %
+                  (item[2], item[1], ex))
     if options.purge:
         uids = set(dstmap.keys()) - srcuid
         for uid in uids:
             try:
                 delete_item(DST, uid, options)
             except Exception as ex:
-                print('fail to delete item: %s due to Exception: %s' % \
-                    (uid, ex))
+                print('fail to delete item: %s due to Exception: %s' %
+                      (uid, ex))
+
 
 def delete_item(DST, uid, options):
     print("DELETE item: %s" % uid)
@@ -39,6 +41,7 @@ def delete_item(DST, uid, options):
     r = url_usr_request(path.join(DST[0], "%s.ics" % uid), DST[1], DST[2])
     r.get_method = lambda: 'DELETE'
     is_ok(urlopen(r))
+
 
 def put_item(DST, item, options):
     print("PUT item: %s [%s]" % (item[2], item[1]))
@@ -50,12 +53,15 @@ def put_item(DST, item, options):
     r.get_method = lambda: 'PUT'
     is_ok(urlopen(r))
 
+
 def is_ok(response):
     if response.getcode() < 200 or response.getcode() >= 300:
         raise AssertionError(status)
 
+
 def uid_seq_map(items):
-    return {e[2]:e[3] for e in items}
+    return {e[2]: e[3] for e in items}
+
 
 def get_items(calendar):
     r'''yield (data, type, uid, sequence)'''
@@ -65,10 +71,12 @@ def get_items(calendar):
         sq = reSeq.search(m.group(0))
         yield m.groups() + (int(sq.group(1)) if sq else 0, )
 
+
 def get_calendar(url, usr=None, pw=None, *args):
     r = url_usr_request(url, usr, pw, *args)
     content = urlopen(r).read()
     return content
+
 
 def url_usr_request(url, usr=None, pw=None, *args):
     r = Request(url, *args)
@@ -77,6 +85,7 @@ def url_usr_request(url, usr=None, pw=None, *args):
         r.add_header("Authorization", "Basic %s" % base64string)
     return r
 
+
 def new_calendar(item):
     c = r'''BEGIN:VCALENDAR
 VERSION:2.0
@@ -84,6 +93,7 @@ VERSION:2.0
 END:VCALENDAR
     ''' % item[0]
     return c.replace('\n', '\r\n')
+
 
 def run(SRC, DST):
     parser = OptionParser()
@@ -97,6 +107,7 @@ def run(SRC, DST):
     options = parser.parse_args()[0]
 
     calflate(SRC, DST, options)
+
 
 if __name__ == '__main__':
     run(SRC, DST)

@@ -12,7 +12,9 @@ from urllib2 import Request, urlopen
 def calflate(SRC, DST):
     events = get_events(get_calendar(*SRC))
     dstmap = uid_seq_map(get_events(get_calendar(*DST)))
+    srcuid = set()
     for event in events:
+        srcuid.add(event[2])
         try:
             if event[2] not in dstmap or event[3] > dstmap[event[2]]:
                 put_event(DST, event)
@@ -20,6 +22,19 @@ def calflate(SRC, DST):
         except Exception as ex:
             print('fail to put event: %s [%s] due to Exception: %s' % \
                 (event[2], event[1], ex))
+    uids = set(dstmap.keys()) - srcuid
+    for uid in uids:
+        try:
+            delete_event(DST, uid)
+        except Exception as ex:
+            print('fail to delete event: %s due to Exception: %s' % \
+                (uid, ex))
+
+def delete_event(DST, uid):
+    print("DELETE event: %s" % uid)
+    r = url_usr_request(path.join(DST[0], "%s.ics" % uid), DST[1], DST[2])
+    r.get_method = lambda: 'DELETE'
+    p = urlopen(r)
 
 def put_event(DST, event):
     print("PUT event: %s [%s]" % (event[2], event[1]))

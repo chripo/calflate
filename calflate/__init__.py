@@ -92,7 +92,7 @@ VERSION:2.0
 %s
 END:VCALENDAR
 ''' % item[0]
-    return c.replace('\n', '\r\n')
+    return c.replace('\n', '\r\n').replace('\r\n\r\n', '\r\n')
 
 
 def run(SRC, DST):

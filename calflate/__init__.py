@@ -40,7 +40,8 @@ def delete_item(DST, uid, options):
         return
     r = url_usr_request(path.join(DST[0], "%s.ics" % uid), DST[1], DST[2])
     r.get_method = lambda: 'DELETE'
-    is_ok(urlopen(r))
+    if not is_ok(urlopen(r)):
+        raise IOError
 
 
 def put_item(DST, item, options):
@@ -51,12 +52,14 @@ def put_item(DST, item, options):
     r = url_usr_request(path.join(DST[0], "%s.ics" % item[2]), DST[1], DST[2], data)
     r.add_header('Content-Type', 'text/calendar')
     r.get_method = lambda: 'PUT'
-    is_ok(urlopen(r))
+    if not is_ok(urlopen(r)):
+        raise IOError
 
 
 def is_ok(response):
-    if response.getcode() < 200 or response.getcode() >= 300:
-        raise AssertionError(status)
+    if not response or response.getcode() < 200 or response.getcode() >= 300:
+        return False
+    return True
 
 
 def uid_seq_map(items):

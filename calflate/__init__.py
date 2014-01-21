@@ -51,8 +51,14 @@ def put_item(DST, item, options):
     if options.dryrun:
         return
     data = new_collection(item)
-    r = url_usr_request(path.join(DST[0], '%s.ics' % item[2]), DST[1], DST[2], data)
-    r.add_header('Content-Type', 'text/calendar')
+    if item[1] == 'VCARD':
+        p = '%s.vcf' % item[2]
+        ctype = 'text/vcard'
+    else:
+        p = '%s.ics' % item[2]
+        ctype = 'text/calendar'
+    r = url_usr_request(path.join(DST[0], p), DST[1], DST[2], data)
+    r.add_header('Content-Type', ctype)
     r.get_method = lambda: 'PUT'
     if not is_ok(urlopen(r)):
         raise IOError

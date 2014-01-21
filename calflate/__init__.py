@@ -37,21 +37,21 @@ def calflate(SRC, DST, options):
 
 
 def delete_item(DST, uid, options):
-    print("DELETE item: %s" % uid)
+    print('DELETE item: %s' % uid)
     if options.dryrun:
         return
-    r = url_usr_request(path.join(DST[0], "%s.ics" % uid), DST[1], DST[2])
+    r = url_usr_request(path.join(DST[0], '%s.ics' % uid), DST[1], DST[2])
     r.get_method = lambda: 'DELETE'
     if not is_ok(urlopen(r)):
         raise IOError
 
 
 def put_item(DST, item, options):
-    print("PUT item: %s [%s]" % (item[2], item[1]))
+    print('PUT item: %s [%s]' % (item[2], item[1]))
     if options.dryrun:
         return
     data = new_collection(item)
-    r = url_usr_request(path.join(DST[0], "%s.ics" % item[2]), DST[1], DST[2], data)
+    r = url_usr_request(path.join(DST[0], '%s.ics' % item[2]), DST[1], DST[2], data)
     r.add_header('Content-Type', 'text/calendar')
     r.get_method = lambda: 'PUT'
     if not is_ok(urlopen(r)):
@@ -108,11 +108,11 @@ def get_collection_from_file(url):
     if path.isfile(url):
         with open(url, 'r') as f:
             c = f.read(20)
-            if c.find("BEGIN:", 0, min(len(c), 20)) != -1:
+            if c.find('BEGIN:', 0, min(len(c), 20)) != -1:
                 f.seek(0)
                 return f.read()
             else:
-                print 'faulty input excpected collection from: %s' % url
+                print('faulty input excpected collection from: %s' % url)
                 return ''
     raise IOError('file not found')
 
@@ -121,7 +121,7 @@ def get_collection_by_GET(r_fac):
     res = urlopen(r_fac())
     if res.getcode() == 200:
         c = res.read()
-        if c.find("BEGIN:", 0, min(len(c), 20)) != -1:
+        if c.find('BEGIN:', 0, min(len(c), 20)) != -1:
             return c
     raise Exception('fail to find BEGIN block')
 
@@ -130,7 +130,7 @@ def url_usr_request(url, usr=None, pw=None, *args):
     r = Request(url, *args)
     if usr and pw:
         base64string = encodestring('%s:%s' % (usr, pw)).replace('\n', '')
-        r.add_header("Authorization", "Basic %s" % base64string)
+        r.add_header('Authorization', 'Basic %s' % base64string)
     return r
 
 
@@ -167,9 +167,10 @@ def run(SRC, DST):
     options = parser.parse_args()[0]
 
     if options.list:
-        print "SRC: %s" % SRC[0]
-        print "DST: %s" % DST[0]
+        print('SRC: %s' % SRC[0])
+        print('DST: %s' % DST[0])
     else:
+
         calflate((options.input, None, None) if options.input else SRC, DST, options)
 
 

@@ -88,11 +88,31 @@ def get_collection(url, usr=None, pw=None, *args):
         return url_usr_request(url, usr, pw, *args)
 
     try:
+        return get_collection_from_file(url)
+    except:
+        pass
+
+    try:
         return get_collection_by_GET(r_fac)
     except:
         pass
 
     raise IOError('fail read collection from: \'%s\'' % url)
+
+
+def get_collection_from_file(url):
+    if url.startswith('~'):
+        url = path.expanduser(url)
+    if path.isfile(url):
+        with open(url, 'r') as f:
+            c = f.read(20)
+            if c.find("BEGIN:", 0, min(len(c), 20)) != -1:
+                f.seek(0)
+                return f.read()
+            else:
+                print 'faulty input excpected collection from: %s' % url
+                return ''
+    raise IOError('file not found')
 
 
 def get_collection_by_GET(r_fac):
@@ -127,6 +147,9 @@ END:VCALENDAR
 def run(SRC, DST):
     parser = OptionParser()
     parser.add_option(
+        '-i', '--input', metavar='FILE',
+        help='import from file', dest='input')
+    parser.add_option(
         '-n', '--dry-drun', action="store_true", default=False,
         help='dry run', dest='dryrun')
     parser.add_option(
@@ -135,7 +158,7 @@ def run(SRC, DST):
 
     options = parser.parse_args()[0]
 
-    calflate(SRC, DST, options)
+    calflate((options.input, None, None) if options.input else SRC, DST, options)
 
 
 if __name__ == '__main__':

@@ -12,8 +12,8 @@ from urllib2 import Request, urlopen
 
 
 def calflate(SRC, DST, options):
-    items = get_items(get_calendar(*SRC))
-    dstmap = uid_seq_map(get_items(get_calendar(*DST)))
+    items = get_items(get_collection(*SRC))
+    dstmap = uid_seq_map(get_items(get_collection(*DST)))
     srcuid = set()
     for item in items:
         srcuid.add(item[2])
@@ -83,10 +83,25 @@ def get_items(calendar):
         yield m.groups() + (rev, )
 
 
-def get_calendar(url, usr=None, pw=None, *args):
-    r = url_usr_request(url, usr, pw, *args)
-    content = urlopen(r).read()
-    return content
+def get_collection(url, usr=None, pw=None, *args):
+    def r_fac():
+        return url_usr_request(url, usr, pw, *args)
+
+    try:
+        return get_collection_by_GET(r_fac)
+    except:
+        pass
+
+    raise IOError('fail read collection from: \'%s\'' % url)
+
+
+def get_collection_by_GET(r_fac):
+    res = urlopen(r_fac())
+    if res.getcode() == 200:
+        c = res.read()
+        if c.find("BEGIN:", 0, min(len(c), 20)) != -1:
+            return c
+    raise Exception('fail to find BEGIN block')
 
 
 def url_usr_request(url, usr=None, pw=None, *args):

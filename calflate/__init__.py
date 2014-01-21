@@ -132,7 +132,7 @@ def get_collection_from_file(url):
                 f.seek(0)
                 return f.read()
             else:
-                print('faulty input excpected collection from: %s' % url)
+                print('faulty input: %s' % url)
                 return ''
     raise IOError('file not found')
 
@@ -186,12 +186,16 @@ def run(SRC, DST):
 
     options = parser.parse_args()[0]
 
-    if options.list:
+    if options.input:
+        SRC = (options.input, None, None)
+
+    if options.list or options.verbose:
         print('SRC: %s' % SRC[0])
         print('DST: %s' % DST[0])
-    else:
+        if options.list:
+            return
 
-        calflate((options.input, None, None) if options.input else SRC, DST, options)
+    calflate(SRC, DST, options)
 
 
 if __name__ == '__main__':

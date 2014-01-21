@@ -21,6 +21,8 @@ def calflate(SRC, DST, options):
             if item[2] not in dstmap or item[3] > dstmap[item[2]]:
                 put_item(DST, item, options)
                 dstmap[item[2]] = item[3]
+            elif options.verbose:
+                print('skip item %s [%s]' % (item[2], item[1]))
         except Exception as ex:
             print('fail to put item: %s [%s] due to Exception: %s' %
                   (item[2], item[1], ex))
@@ -158,6 +160,9 @@ def run(SRC, DST):
     parser.add_option(
         '-p', '--purge', action='store_true', default=False,
         help='purge orphan items')
+    parser.add_option(
+        '-v', '--verbose', action='store_true', default=False,
+        help='verbose')
 
     options = parser.parse_args()[0]
 

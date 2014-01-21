@@ -35,17 +35,18 @@ def calflate(SRC, DST, options):
         uids = set(dstmap.keys()) - srcuid
         for uid in uids:
             try:
-                delete_item(DST, uid, options)
+                delete_item(DST, uid, srcType, options)
             except Exception as ex:
                 print('fail to delete item: %s due to Exception: %s' %
                       (uid, ex))
 
 
-def delete_item(DST, uid, options):
-    print('DELETE item: %s' % uid)
+def delete_item(DST, uid, cType, options):
+    p = '%s.%s' % (uid, 'vcf' if ctype == 'VCARD' else 'ics')
+    print('DELETE item: %s' % p)
     if options.dryrun:
         return
-    r = url_usr_request(path.join(DST[0], '%s.ics' % uid), DST[1], DST[2])
+    r = url_usr_request(path.join(DST[0], p), DST[1], DST[2])
     r.get_method = lambda: 'DELETE'
     if not is_ok(urlopen(r)):
         raise IOError

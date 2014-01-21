@@ -150,15 +150,22 @@ def run(SRC, DST):
         '-i', '--input', metavar='FILE',
         help='import from file', dest='input')
     parser.add_option(
-        '-n', '--dry-drun', action="store_true", default=False,
+        '-l', '--list', action='store_true', default=False,
+        help='list URLs')
+    parser.add_option(
+        '-n', '--dry-drun', action='store_true', default=False,
         help='dry run', dest='dryrun')
     parser.add_option(
-        '-p', '--purge', action="store_true", default=False,
+        '-p', '--purge', action='store_true', default=False,
         help='purge orphan items')
 
     options = parser.parse_args()[0]
 
-    calflate((options.input, None, None) if options.input else SRC, DST, options)
+    if options.list:
+        print "SRC: %s" % SRC[0]
+        print "DST: %s" % DST[0]
+    else:
+        calflate((options.input, None, None) if options.input else SRC, DST, options)
 
 
 if __name__ == '__main__':

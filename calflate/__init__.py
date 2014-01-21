@@ -12,8 +12,13 @@ from urllib2 import Request, urlopen
 
 
 def calflate(SRC, DST, options):
-    items = get_items(get_collection(*SRC))
-    dstmap = uid_seq_map(get_items(get_collection(*DST)))
+    srcCollection, srcType = get_collection(*SRC)
+    dstCollection, dstType = get_collection(*DST)
+    if srcType != dstType or not srcType:
+        print('collection types dosen\'t match %s != %s' % (srcType, dstType))
+        return
+    items = get_items(srcCollection, srcType)
+    dstmap = uid_seq_map(get_items(dstCollection, srcType))
     srcuid = set()
     for item in items:
         srcuid.add(item[2])
@@ -74,13 +79,14 @@ def uid_seq_map(items):
     return {e[2]: e[3] for e in items}
 
 
-def get_items(calendar):
-    r'''yield (data, type, uid, sequence)'''
+def get_items(collection, filter_ctype=None):
+    '''yield (data, type, uid, sequence)'''
+
     reItem = re.compile(
         r'^(BEGIN:(VEVENT|VTODO|VJOURNAL|VCARD)$.*?^UID:(.+?)$.*?^END:\2$)', re.S | re.M)
     reSeq = re.compile(r'^SEQUENCE:(\d+?)$', re.M)
     reRev = re.compile(r'^REV:(.+?)$', re.M)
-    for m in reItem.finditer(calendar):
+    for m in reItem.finditer(collection):
         if m.group(2) == 'VCARD':
             rev = reRev.search(m.group(1))
             # TODO: check if all date values are sortable
@@ -91,17 +97,24 @@ def get_items(calendar):
         yield m.groups() + (rev, )
 
 
+def collection_with_ctype(collection):
+    reType = re.compile(r'BEGIN:(VCALENDAR|VCARD)')
+    m = reType.search(collection)
+    return collection, m.group(1) if m else None
+
+
 def get_collection(url, usr=None, pw=None, *args):
+    '''return data, type'''
     def r_fac():
         return url_usr_request(url, usr, pw, *args)
 
     try:
-        return get_collection_from_file(url)
+        return collection_with_ctype(get_collection_from_file(url))
     except:
         pass
 
     try:
-        return get_collection_by_GET(r_fac)
+        return collection_with_ctype(get_collection_by_GET(r_fac))
     except:
         pass
 

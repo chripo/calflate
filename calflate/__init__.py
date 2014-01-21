@@ -5,6 +5,7 @@
 # CREATED: 2014-01-16
 
 from base64 import encodestring
+import xml.etree.ElementTree as ET
 from optparse import OptionParser
 from os import path
 import re
@@ -92,6 +93,11 @@ def get_collection(url, usr=None, pw=None, *args):
     except:
         pass
 
+    try:
+        return get_collection_by_REPORT(r_fac)
+    except:
+        pass
+
     raise IOError('fail read collection from: \'%s\'' % url)
 
 
@@ -102,6 +108,73 @@ def get_collection_by_GET(r_fac):
         if c.find("BEGIN:", 0, min(len(c), 20)) != -1:
             return c
     raise Exception('fail to find BEGIN block')
+
+
+def get_collection_by_REPORT(r_fac):
+    r = r_fac()
+    r.get_method = lambda: 'PROPFIND'
+    r.add_header('Depth', '0')
+    r.add_header('Content-Type', 'application/xml; charset=utf-8')
+    r.data = r'''<propfind xmlns="DAV:">
+    <prop>
+        <resourcetype />
+        <getcontenttype />
+    </prop>
+</propfind>'''
+
+    res = urlopen(r)
+    if not res or res.getcode() != 207:
+        raise Exception('fail to get multistatus PROPFIND')
+
+    root = ET.fromstring(res.read())
+    ns = {'D': 'DAV:',
+          'C': 'urn:ietf:params:xml:ns:caldav',
+          'CS': 'http://calendarserver.org/ns/',
+          'CR': 'urn:ietf:params:xml:ns:carddav'}
+
+    restype = None
+    for p in root.findall('./D:response/D:propstat/D:prop/*', namespaces=ns):
+        if p.tag == '{DAV:}resourcetype':
+            for t in list(p):
+                if t.tag == '{urn:ietf:params:xml:ns:caldav}calendar':
+                    restype = 'VCALENDAR'
+                elif t.tag == '{urn:ietf:params:xml:ns:carddav}addressbook':
+                    restype = 'VADDRESSBOOK'
+                else:
+                    continue
+                break
+        elif p.tag == '{DAV:}getcontenttype':
+            if p.text == 'text/calendar':
+                restype = 'VCALENDAR'
+            elif p.text == 'text/vcard':
+                restype = 'VADDRESSBOOK'
+            else:
+                continue
+        if restype:
+            break
+
+    if not restype:
+        raise Exception('fail to detect content type')
+
+    r = r_fac()
+    r.get_method = lambda: 'REPORT'
+    r.add_header('Depth', '1')
+    r.add_header('Content-Type', 'application/xml; charset=utf-8')
+    r.data = r'''<c:calendar-query xmlns:d="DAV:" xmlns:c="urn:ietf:params:xml:ns:caldav">
+    <d:prop>
+        <d:getetag />
+        <c:calendar-data />
+    </d:prop>
+    <c:filter>
+        <c:comp-filter name="%s" />
+    </c:filter>
+</c:calendar-query>''' % restype
+
+    res = urlopen(r)
+    if res.getcode() != 207:
+        raise Exception('fail to get multistatus REPORT')
+
+    raise Exception('TODO parse calendar-data REPORT')
 
 
 def url_usr_request(url, usr=None, pw=None, *args):

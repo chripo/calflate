@@ -5,7 +5,6 @@
 # CREATED: 2014-01-16
 
 from base64 import encodestring
-from optparse import OptionParser
 from os import path
 import re
 from urllib2 import Request, urlopen
@@ -164,39 +163,3 @@ VERSION:2.0
 END:VCALENDAR
 ''' % item[0]
     return c.replace('\n', '\r\n').replace('\r\n\r\n', '\r\n')
-
-
-def run(SRC, DST):
-    parser = OptionParser()
-    parser.add_option(
-        '-i', '--input', metavar='FILE',
-        help='import from file', dest='input')
-    parser.add_option(
-        '-l', '--list', action='store_true', default=False,
-        help='list URLs')
-    parser.add_option(
-        '-n', '--dry-drun', action='store_true', default=False,
-        help='dry run', dest='dryrun')
-    parser.add_option(
-        '-p', '--purge', action='store_true', default=False,
-        help='purge orphan items')
-    parser.add_option(
-        '-v', '--verbose', action='store_true', default=False,
-        help='verbose')
-
-    options = parser.parse_args()[0]
-
-    if options.input:
-        SRC = (options.input, None, None)
-
-    if options.list or options.verbose:
-        print('SRC: %s' % SRC[0])
-        print('DST: %s' % DST[0])
-        if options.list:
-            return
-
-    calflate(SRC, DST, options)
-
-
-if __name__ == '__main__':
-    run(SRC, DST)

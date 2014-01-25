@@ -17,7 +17,8 @@ except ImportError:
 
 
 def run():
-    parser = OptionParser()
+    usage = 'usage: %prog [options] COLLECTION [ COLLECTION ] [ ... ]'
+    parser = OptionParser(usage=usage)
     parser.add_option(
         '-c', '--config', metavar='FILE',
         help='custom config file path', dest='config')
@@ -37,7 +38,11 @@ def run():
         '-v', '--verbose', action='store_true', default=False,
         help='verbose')
 
-    items = _get_collection_set(*_get_config(parser.parse_args()[0]))
+    options, selection = parser.parse_args()
+    if len(selection) < 1 and not options.list:
+        parser.error("incorrect number of arguments")
+
+    items = _get_collection_set(selection, *_get_config(options))
     for name, src, dst, opts in items:
         print('collection: %s' % name)
         if opts.input:
@@ -50,7 +55,7 @@ def run():
         calflate(src, dst, opts)
 
 
-def _get_collection_set(cfg, options):
+def _get_collection_set(selection, cfg, options):
     '''yields name, src, dst, opts'''
     def _v(section, key, val=None):
         try:
@@ -59,7 +64,10 @@ def _get_collection_set(cfg, options):
             pass
         return val
 
+    filter = False if '*' in selection or options.list else True
     for s in cfg.sections():
+        if filter and s not in selection:
+            continue
         if cfg.has_option(s, 'src') and cfg.has_option(s, 'dst'):
             opts = deepcopy(options)
             for key in cfg.options(s):

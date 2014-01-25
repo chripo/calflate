@@ -22,7 +22,7 @@ Insert and adjust the following section into a file, located at
 `~/.config/calflate.cfg`.
 
 ```sh
-[ID]
+[COLLECTION-NAME]
 verbose = true
 src = https://srchost/usr/src_calendar.ics/
 src_user = foofoo
@@ -32,6 +32,8 @@ dst_user = foo
 dst_pass = bar
 ```
 Execute `calflate --help` to show usage.
+`calflate COLLECITON-ID` to import a specific collection or 
+`calflate *` to import all.
 
 Contributions
 -------------

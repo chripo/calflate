@@ -13,9 +13,9 @@ Setup
 -----
 
 ```sh
-git clone https://github.com/chripo/calflate.git
-cd calflate
-ln -s `pwd`/calflate.py ~/bin/calflate
+# create a virualenv
+pip install https://github.com/chripo/calflate/zipball/master
+ln -s $VIRTUAL_ENV/bin/calflate ~/bin/calflate
 ```
 
 Insert and adjust the following section into a file, located at 
@@ -32,8 +32,8 @@ dst_user = foo
 dst_pass = bar
 ```
 Execute `calflate --help` to show usage.
-`calflate COLLECITON-ID` to import a specific collection or 
-`calflate *` to import all.
+`calflate COLLECITON-NAME` to import a specific collection or 
+`calflate *` to select all.
 
 Contributions
 -------------

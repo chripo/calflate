@@ -10,9 +10,14 @@ setup(
     author_email='labs@polcin.de',
     url='https://github.com/chripo/calflate',
     license='BSD',
+    platforms='Any',
     packages=['calflate'],
+    provides=['calflate'],
+    scripts=['bin/calflate'],
+    keywords=['calendar', 'addressbook', 'CalDAV', 'CardDAV'],
     classifiers=[
         'Development Status :: 4 - Beta',
-        'Environment :: Console'
+        'Environment :: Console',
+        'Operating System :: OS Independent'
     ],
 )

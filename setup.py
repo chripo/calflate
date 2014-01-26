@@ -5,8 +5,8 @@ from setuptools import setup
 
 setup(
     name='calflate',
-    version='0.3',
-    description='import external calendar events and vcards',
+    version='0.4',
+    description='import external CalDAV and CardDAV entries',
     long_description=open(join(dirname(__file__), 'README.rst')).read(),
     author='Christoph Polcin',
     author_email='labs@polcin.de',

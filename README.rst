@@ -24,13 +24,9 @@ Featues
 Quickstart
 ----------
 
-**Install from source**
-
 ::
 
-    # create a virualenv
-    pip install https://github.com/chripo/calflate/zipball/master
-    ln -s $VIRTUAL_ENV/bin/calflate ~/bin/calflate
+    easy_install -U calflate
 
 **Configure**
 

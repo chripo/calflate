@@ -1,8 +1,10 @@
 # -*- encoding: utf-8 -*-
 
-# AUTHOR: http://www.christoph-polcin.com
 # LICENSE: FreeBSD License
 # CREATED: 2014-01-16
+
+__author__ = 'Christoph Polcin <labs@polcin.de>'
+__url__ = 'https://github.com/chripo/calflate/'
 
 from base64 import encodestring
 from os import path

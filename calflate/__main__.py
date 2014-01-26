@@ -4,6 +4,8 @@
 # LICENSE: FreeBSD License
 # CREATED: 2014-01-25
 
+VERSION = '0.4.1'
+
 from . import calflate
 from copy import deepcopy
 from optparse import OptionParser
@@ -18,7 +20,7 @@ except ImportError:
 
 def run():
     usage = 'usage: %prog [options] COLLECTION [ COLLECTION ] [ ... ]'
-    parser = OptionParser(usage=usage)
+    parser = OptionParser(usage=usage, version='%prog ' + VERSION)
     parser.add_option(
         '-c', '--config', metavar='FILE',
         help='custom config file path', dest='config')

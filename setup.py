@@ -1,16 +1,18 @@
 #!/usr/bin/env python
 
+from calflate.__main__ import VERSION
 from os.path import join, dirname
 from setuptools import setup
 
 setup(
     name='calflate',
-    version='0.4',
+    version=VERSION,
     description='import external CalDAV and CardDAV entries',
     long_description=open(join(dirname(__file__), 'README.rst')).read(),
     author='Christoph Polcin',
     author_email='labs@polcin.de',
-    url='https://github.com/chripo/calflate',
+    url='https://github.com/chripo/calflate/',
+    download_url='https://github.com/chripo/calflate/tarball/%s' % VERSION,
     license='BSD revised',
     platforms='Any',
     packages=['calflate'],

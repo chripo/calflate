@@ -7,7 +7,7 @@ setup(
     name='calflate',
     version='0.3',
     description='import external calendar events and vcards',
-    long_description=open(join(dirname(__file__), 'README.md')).read(),
+    long_description=open(join(dirname(__file__), 'README.rst')).read(),
     author='Christoph Polcin',
     author_email='labs@polcin.de',
     url='https://github.com/chripo/calflate',

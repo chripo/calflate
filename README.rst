@@ -70,7 +70,7 @@ the following section for each collection that should be imported.
 **Execute**
 
 - ``calflate --help`` to show usage. 
-- ``calflate COLLECITON-NAME`` to import a specific collection or 
+- ``calflate COLLECTION-NAME`` to import a specific collection or 
 - ``calflate '*'`` to conflate all sets.
 
 Contributions

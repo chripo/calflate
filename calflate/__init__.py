@@ -40,8 +40,8 @@ def calflate(SRC, DST, options):
                       (uid, ex))
 
 
-def delete_item(DST, uid, cType, options):
-    p = '%s.%s' % (uid, 'vcf' if cType == 'VCARD' else 'ics')
+def delete_item(DST, uid, ctype, options):
+    p = '%s.%s' % (uid, 'vcf' if ctype == 'VCARD' else 'ics')
     print('DELETE item: %s' % p)
     if options.dryrun:
         return

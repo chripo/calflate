@@ -17,6 +17,8 @@ def calflate(SRC, DST, options):
         print('collection types dosen\'t match %s != %s' % (srcType, dstType))
         return
     items = get_items(srcCollection, srcType)
+    if hasattr(options, 'uid_from') and hasattr(options, 'uid_to'):
+        items = replace_uid(items, options.uid_from, options.uid_to)
     dstmap = uid_seq_map(get_items(dstCollection, srcType))
     srcuid = set()
     for item in items:
@@ -96,6 +98,20 @@ def get_items(collection, filter_ctype=None):
             rev = reSeq.search(data)
             rev = int(rev.group(1)) if rev else 0
         yield (data, ctype, uid, rev, )
+
+
+def replace_uid(items, uidfrom, uidto):
+    '''relaces all occurrences of UID based on a regular expression.
+     yield (data, type, uid, sequence)'''
+
+    print('UID replace pattern: %s -> %s' % (uidfrom, uidto))
+    reUid = re.compile(uidfrom)
+    for data, ctype, ouid, rev in items:
+        uid = reUid.sub(uidto, ouid)
+        if uid != ouid:
+            data = data.replace(ouid, uid)
+        print('UID %s -> %s' % (ouid, uid))
+        yield data, ctype, uid, rev
 
 
 def collection_with_ctype(collection):

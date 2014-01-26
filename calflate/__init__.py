@@ -87,14 +87,15 @@ def get_items(collection, filter_ctype=None):
     reSeq = re.compile(r'^SEQUENCE:(\d+?)$', re.M)
     reRev = re.compile(r'^REV:(.+?)$', re.M)
     for m in reItem.finditer(collection):
-        if m.group(2) == 'VCARD':
-            rev = reRev.search(m.group(1))
+        data, ctype, uid = m.groups()
+        if ctype == 'VCARD':
+            rev = reRev.search(data)
             # TODO: check if all date values are sortable
             rev = rev.group(1) if rev else '0'
         else:
-            rev = reSeq.search(m.group(1))
+            rev = reSeq.search(data)
             rev = int(rev.group(1)) if rev else 0
-        yield m.groups() + (rev, )
+        yield (data, ctype, uid, rev, )
 
 
 def collection_with_ctype(collection):

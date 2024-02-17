@@ -2,12 +2,12 @@ Welcome to Calflate
 ===================
 
 *Calflate* is a command line application that **conflates** external 
-*CalDAV* and *CardDAV* entries into an other online collection. 
-It does an one-way sync of calendar EVENTs, TODOs, JOURNALs and 
+*CalDAV* and *CardDAV* entries into another online collection. 
+It does a one-way sync of calendar EVENTs, TODOs, JOURNALs and 
 addressbook entries (VCARD) based on ``UIDs`` and ``SEQUENCE`` or 
 ``REV`` numbers.
 
-*Calflate* is written in Python, it has no dependencies and 
+*Calflate* is written in Python, it has no dependencies and is
 licenced under the **FreeBSD License**. The source code and 
 issue tracker is available at https://github.com/chripo/calflate.
 
